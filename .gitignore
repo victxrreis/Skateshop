@@ -1,15 +1,37 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Arquivos gerados pelo Gradle
+.gradle/
+build/
+
+# Arquivos locais
 local.properties
+
+# Arquivos do IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+# Remover cache de execução do Android Studio
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Arquivos de Build
+*/build/
+captures/
+output/
+*.apk
+*.aab
+*.ap_
+
+# Arquivos de Keystore
+*.jks
+*.keystore
+
+# Arquivos gerados pelo KSP/KAPT
+app/build/generated/
+*/build/generated/
+

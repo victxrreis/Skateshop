@@ -1,10 +1,6 @@
 package br.com.skateshop.ui.features.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,19 +8,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import br.com.skateshop.ui.components.ProductCard
@@ -34,7 +21,8 @@ import br.com.skateshop.ui.components.ProductCard
 fun HomeScreen(
     viewModel: HomeViewModel,
     onProdutoClick: (String) -> Unit,
-    onCarrinhoClick: () -> Unit
+    onCarrinhoClick: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     val produtos by viewModel.produtosExibidos.collectAsState()
     val categorias by viewModel.categorias.collectAsState()
@@ -44,6 +32,11 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Skateshop") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar para seleção")
+                    }
+                },
                 actions = {
                     IconButton(onClick = onCarrinhoClick) {
                         Icon(Icons.Default.ShoppingCart, contentDescription = "Carrinho")
