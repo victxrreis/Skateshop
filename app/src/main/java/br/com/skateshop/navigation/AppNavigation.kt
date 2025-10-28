@@ -125,9 +125,11 @@ fun AppNavigation() {
                     navController.navigate(Routes.ADMIN_HOME_SCREEN) {
                         popUpTo(Routes.ADMIN_LOGIN_SCREEN) { inclusive = true }
                     }
-                }
+                },
+                onBack = { navController.popBackStack() } // ⬅️ Não se esqueça de adicionar esta linha!
             )
         }
+
         composable(Routes.ADMIN_HOME_SCREEN) {
             AdminHomeScreen(
                 viewModel = adminViewModel,
