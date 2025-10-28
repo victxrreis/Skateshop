@@ -11,6 +11,9 @@ import br.com.skateshop.ui.features.selection.SelectionScreen
 import br.com.skateshop.ui.features.home.HomeScreen
 import br.com.skateshop.ui.features.details.DetalheProdutoScreen
 import br.com.skateshop.ui.features.cart.CartScreen
+// IMPORTAR NOVOS
+import br.com.skateshop.ui.features.cart.CartViewModel
+import br.com.skateshop.ui.features.cart.CartViewModelFactory
 import br.com.skateshop.ui.features.checkout.CheckoutScreen
 import br.com.skateshop.ui.features.checkout.OrderSuccessScreen
 import br.com.skateshop.ui.features.admin.AdminLoginScreen
@@ -41,6 +44,8 @@ fun AppNavigation() {
 
     val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(context))
     val adminViewModel: AdminViewModel = viewModel(factory = AdminViewModelFactory(context))
+    // ADICIONAR ESTA LINHA
+    val cartViewModel: CartViewModel = viewModel(factory = CartViewModelFactory(context))
 
     NavHost(navController = navController, startDestination = Routes.HOME_SCREEN) {
 
@@ -76,7 +81,9 @@ fun AppNavigation() {
                 viewModel = homeViewModel,
                 produtoId = produtoId,
                 onBack = { navController.popBackStack() },
-                onAddToCartClick = {
+                // ATUALIZAR onAddToCartClick
+                onAddToCartClick = { produto ->
+                    cartViewModel.adicionarItem(produto) // Adiciona ao VM
                     navController.navigate(Routes.CARRINHO_SCREEN)
                 }
             )
@@ -84,6 +91,7 @@ fun AppNavigation() {
 
         composable(Routes.CARRINHO_SCREEN) {
             CartScreen(
+                viewModel = cartViewModel, // Passar o VM
                 onBack = { navController.popBackStack() },
                 onCheckoutClick = { navController.navigate(Routes.CHECKOUT_SCREEN) }
             )
@@ -92,7 +100,9 @@ fun AppNavigation() {
             CheckoutScreen(
                 onBack = { navController.popBackStack() },
                 onOrderSuccess = {
+                    cartViewModel.limparCarrinho() // Limpa o carrinho
                     navController.navigate(Routes.PEDIDO_SUCESSO_SCREEN) {
+                        // Limpa a pilha de navegação até a Home
                         popUpTo(Routes.HOME_SCREEN) { inclusive = false }
                     }
                 }
