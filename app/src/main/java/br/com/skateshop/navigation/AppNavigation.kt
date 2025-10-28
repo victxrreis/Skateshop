@@ -47,7 +47,8 @@ fun AppNavigation() {
     // ADICIONAR ESTA LINHA
     val cartViewModel: CartViewModel = viewModel(factory = CartViewModelFactory(context))
 
-    NavHost(navController = navController, startDestination = Routes.HOME_SCREEN) {
+    // Corrigido: Removida a chave dupla e o startDestination ajustado
+    NavHost(navController = navController, startDestination = Routes.TELA_SELECAO_MODO) {
 
         composable(Routes.TELA_SELECAO_MODO) {
             SelectionScreen(

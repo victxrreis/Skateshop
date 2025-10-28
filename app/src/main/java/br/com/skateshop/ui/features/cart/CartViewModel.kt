@@ -1,9 +1,9 @@
 package br.com.skateshop.ui.features.cart
 
-import androidxx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel // <-- Corrigido de 'androidxx' para 'androidx'
 import androidx.lifecycle.viewModelScope
 import br.com.skateshop.data.model.Produto
-import br.com.skateshop.data.repository.ProdutoRepository
+import br.com.skateshop.data.repository.ProdutoRepository // <-- Certifique-se que este import está correto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,12 +25,12 @@ data class CartUiState(
 )
 
 class CartViewModel(
-    // Mesmo que não seja usado agora, seguimos o padrão para futura verificação de estoque
+    // Requer o Repository para que a Factory possa injetá-lo
     private val repository: ProdutoRepository
 ) : ViewModel() {
 
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
-    
+
     // Estado da UI que combina itens e total
     val uiState: StateFlow<CartUiState> = _cartItems.map { items ->
         val total = items.sumOf { it.produto.preco * it.quantidade }
@@ -71,7 +71,7 @@ class CartViewModel(
             removerItem(produtoId)
             return
         }
-        
+
         _cartItems.update { currentItems ->
             currentItems.map {
                 if (it.produto.id == produtoId) {
