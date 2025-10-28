@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.com.skateshop.data.model.Produto // Importado
 import br.com.skateshop.ui.components.InfoRow
 import br.com.skateshop.ui.features.home.HomeViewModel
 import coil.compose.AsyncImage
@@ -42,7 +43,7 @@ fun DetalheProdutoScreen(
     viewModel: HomeViewModel,
     produtoId: String,
     onBack: () -> Unit,
-    onAddToCartClick: () -> Unit
+    onAddToCartClick: (Produto) -> Unit // Assinatura atualizada
 ) {
     val produto by viewModel.produtoSelecionado.collectAsState()
 
@@ -64,13 +65,19 @@ fun DetalheProdutoScreen(
         bottomBar = {
             Surface(shadowElevation = 8.dp) {
                 Button(
-                    onClick = onAddToCartClick,
+                    // Lógica do onClick atualizada
+                    onClick = {
+                        produto?.let { onAddToCartClick(it) }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .height(50.dp)
+                        .height(50.dp),
+                    // Desabilita o botão enquanto o produto não for carregado
+                    enabled = produto != null
                 ) {
-                    Text("Adicionar ao Carrinho (Vai para Fase 4)", fontSize = 16.sp)
+                    // Texto do botão atualizado
+                    Text("Adicionar ao Carrinho", fontSize = 16.sp)
                 }
             }
         }
@@ -84,7 +91,8 @@ fun DetalheProdutoScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(bottom = 70.dp)
+                    // Ajuste no padding para não cobrir o conteúdo com a bottomBar
+                    .padding(bottom = 70.dp) 
                     .verticalScroll(rememberScrollState())
             ) {
                 AsyncImage(
