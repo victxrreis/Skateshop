@@ -1,6 +1,8 @@
 package br.com.skateshop.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import br.com.skateshop.ui.features.admin.AdminViewModelFactory
@@ -11,11 +13,14 @@ import br.com.skateshop.ui.features.selection.SelectionScreen
 import br.com.skateshop.ui.features.home.HomeScreen
 import br.com.skateshop.ui.features.details.DetalheProdutoScreen
 import br.com.skateshop.ui.features.cart.CartScreen
-// IMPORTAR NOVOS
 import br.com.skateshop.ui.features.cart.CartViewModel
 import br.com.skateshop.ui.features.cart.CartViewModelFactory
 import br.com.skateshop.ui.features.checkout.CheckoutScreen
 import br.com.skateshop.ui.features.checkout.OrderSuccessScreen
+// IMPORTS NOVOS
+import br.com.skateshop.ui.features.checkout.CheckoutViewModel
+import br.com.skateshop.ui.features.checkout.CheckoutViewModelFactory
+import br.com.skateshop.ui.features.checkout.PaymentScreen
 import br.com.skateshop.ui.features.admin.AdminLoginScreen
 import br.com.skateshop.ui.features.admin.AdminHomeScreen
 import br.com.skateshop.ui.features.admin.AdminEditProductScreen
@@ -31,6 +36,7 @@ object Routes {
     const val DETALHE_PRODUTO_SCREEN = "detalhe_produto_screen"
     const val CARRINHO_SCREEN = "carrinho_screen"
     const val CHECKOUT_SCREEN = "checkout_screen"
+    const val PAYMENT_SCREEN = "payment_screen" // NOVA ROTA
     const val PEDIDO_SUCESSO_SCREEN = "pedido_sucesso_screen"
     const val ADMIN_LOGIN_SCREEN = "admin_login_screen"
     const val ADMIN_HOME_SCREEN = "admin_home_screen"
@@ -42,10 +48,12 @@ fun AppNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
 
+    // ViewModels
     val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(context))
     val adminViewModel: AdminViewModel = viewModel(factory = AdminViewModelFactory(context))
-    // ADICIONAR ESTA LINHA
     val cartViewModel: CartViewModel = viewModel(factory = CartViewModelFactory(context))
+    // ADICIONAR CHECKOUT VIEWMODEL
+    val checkoutViewModel: CheckoutViewModel = viewModel(factory = CheckoutViewModelFactory())
 
     NavHost(navController = navController, startDestination = Routes.HOME_SCREEN) {
 
@@ -81,33 +89,51 @@ fun AppNavigation() {
                 viewModel = homeViewModel,
                 produtoId = produtoId,
                 onBack = { navController.popBackStack() },
-                // ATUALIZAR onAddToCartClick
                 onAddToCartClick = { produto ->
-                    cartViewModel.adicionarItem(produto) // Adiciona ao VM
+                    cartViewModel.adicionarItem(produto)
                     navController.navigate(Routes.CARRINHO_SCREEN)
                 }
             )
         }
 
+        // ATUALIZAR CARRINHO
         composable(Routes.CARRINHO_SCREEN) {
             CartScreen(
-                viewModel = cartViewModel, // Passar o VM
+                viewModel = cartViewModel,
                 onBack = { navController.popBackStack() },
-                onCheckoutClick = { navController.navigate(Routes.CHECKOUT_SCREEN) }
+                onCheckoutClick = { navController.navigate(Routes.CHECKOUT_SCREEN) } // Vai para Checkout (Endereço)
             )
         }
+        
+        // ATUALIZAR CHECKOUT (AGORA É ENDEREÇO/FRETE)
         composable(Routes.CHECKOUT_SCREEN) {
             CheckoutScreen(
+                viewModel = checkoutViewModel, // Passa o VM
+                onBack = { navController.popBackStack() },
+                onGoToPayment = {
+                    navController.navigate(Routes.PAYMENT_SCREEN) // Vai para Pagamento
+                }
+            )
+        }
+        
+        // NOVA TELA DE PAGAMENTO
+        composable(Routes.PAYMENT_SCREEN) {
+            val cartState by cartViewModel.uiState.collectAsState() // Pega o estado do carrinho
+            
+            PaymentScreen(
+                viewModel = checkoutViewModel, // Passa o MESMO VM
+                cartState = cartState, // Passa o estado do carrinho para o total
                 onBack = { navController.popBackStack() },
                 onOrderSuccess = {
-                    cartViewModel.limparCarrinho() // Limpa o carrinho
+                    cartViewModel.limparCarrinho()
+                    checkoutViewModel.limparCheckout() // Limpa o estado do checkout
                     navController.navigate(Routes.PEDIDO_SUCESSO_SCREEN) {
-                        // Limpa a pilha de navegação até a Home
                         popUpTo(Routes.HOME_SCREEN) { inclusive = false }
                     }
                 }
             )
         }
+
         composable(Routes.PEDIDO_SUCESSO_SCREEN) {
             OrderSuccessScreen(
                 onContinueShopping = {
