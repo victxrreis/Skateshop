@@ -55,7 +55,8 @@ fun AppNavigation() {
     // ADICIONAR CHECKOUT VIEWMODEL
     val checkoutViewModel: CheckoutViewModel = viewModel(factory = CheckoutViewModelFactory())
 
-    NavHost(navController = navController, startDestination = Routes.HOME_SCREEN) {
+    // Corrigido: Removida a chave dupla e o startDestination ajustado
+    NavHost(navController = navController, startDestination = Routes.TELA_SELECAO_MODO) {
 
         composable(Routes.TELA_SELECAO_MODO) {
             SelectionScreen(
@@ -150,9 +151,11 @@ fun AppNavigation() {
                     navController.navigate(Routes.ADMIN_HOME_SCREEN) {
                         popUpTo(Routes.ADMIN_LOGIN_SCREEN) { inclusive = true }
                     }
-                }
+                },
+                onBack = { navController.popBackStack() } // ⬅️ Não se esqueça de adicionar esta linha!
             )
         }
+
         composable(Routes.ADMIN_HOME_SCREEN) {
             AdminHomeScreen(
                 viewModel = adminViewModel,
